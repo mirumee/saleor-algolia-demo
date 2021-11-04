@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saleor Algolia Configuration</title>
+</head>
+
+<body>
+    <div id="root" data-domain="{{domain}}"
+        data-configuration-url="{{url_for('configuration-data')}}" data-webhook-types="{{webhooks_values|join(',')}}"
+        data-languages="{{languages}}"></div>
+
+    <!-- <div id="root" data-user-token="{{token}}" data-domain="{{domain}}"
+        data-configuration-url="{{url_for('configuration-data')}}" data-webhook-types="PRODUCT_CREATED,PRODUCT_UPDATED,PRODUCT_DELETED,PRODUCT_VARIANT_CREATED,PRODUCT_VARIANT_UPDATED,PRODUCT_VARIANT_DELETED"
+        data-languages='[{"code": "AR", "language": "Arabic"}, {"code": "AZ", "language": "Azerbaijani"}, {"code": "BG", "language": "Bulgarian"}, {"code": "BN", "language": "Bengali"}, {"code": "CA", "language": "Catalan"}, {"code": "CS", "language": "Czech"}, {"code": "DA", "language": "Danish"}, {"code": "DE", "language": "German"}, {"code": "EL", "language": "Greek"}, {"code": "EN", "language": "English"}, {"code": "ES", "language": "Spanish"}, {"code": "ES_CO", "language": "Colombian Spanish"}, {"code": "ET", "language": "Estonian"}, {"code": "FA", "language": "Persian"}, {"code": "FI", "language": "Finnish"}, {"code": "FR", "language": "French"}, {"code": "HI", "language": "Hindi"}, {"code": "HU", "language": "Hungarian"}, {"code": "HY", "language": "Armenian"}, {"code": "ID", "language": "Indonesian"}, {"code": "IS", "language": "Icelandic"}, {"code": "IT", "language": "Italian"}, {"code": "JA", "language": "Japanese"}, {"code": "KA", "language": "Georgian"}, {"code": "KM", "language": "Khmer"}, {"code": "KO", "language": "Korean"}, {"code": "LT", "language": "Lithuanian"}, {"code": "MN", "language": "Mongolian"}, {"code": "MY", "language": "Burmese"}, {"code": "NB", "language": "Norwegian"}, {"code": "NL", "language": "Dutch"}, {"code": "PL", "language": "Polish"}, {"code": "PT", "language": "Portuguese"}, {"code": "PT_BR", "language": "Brazilian Portuguese"}, {"code": "RO", "language": "Romanian"}, {"code": "RU", "language": "Russian"}, {"code": "SK", "language": "Slovak"}, {"code": "SL", "language": "Slovenian"}, {"code": "SQ", "language": "Albanian"}, {"code": "SR", "language": "Serbian"}, {"code": "SV", "language": "Swedish"}, {"code": "SW", "language": "Swahili"}, {"code": "TA", "language": "Tamil"}, {"code": "TH", "language": "Thai"}, {"code": "TR", "language": "Turkish"}, {"code": "UK", "language": "Ukrainian"}, {"code": "VI", "language": "Vietnamese"}, {"code": "ZH_HANS", "language": "Simplified Chinese"}, {"code": "ZH_HANT", "language": "Traditional Chinese"}]' data-channels="{{channels}}"></div> -->
+        
+    <script type="module" src="/src/config.jsx"></script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+version: "3.7"
+
+services:
+  api:
+    ports:
+      - 8000:8000
+    build:
+      context: ./saleor
+      dockerfile: ./Dockerfile
+      args:
+        STATIC_URL: "/static/"
+    networks:
+      - saleor-backend-tier
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - saleor-media:/app/media
+    env_file: common.env
+    environment:
+      - STOREFRONT_URL=http://localhost:3000/
+      - DASHBOARD_URL=http://localhost:9000/
+
+  storefront:
+    build:
+      context: ./saleor-storefront
+      dockerfile: ./Dockerfile.dev
+    network_mode: "host"
+    command: npm start
+
+  dashboard:
+    build:
+      context: ./saleor-dashboard
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - 9000:9000
+    command: npm start -- --host 0.0.0.0
+
+  db:
+    image: library/postgres:11.1-alpine
+    ports:
+      - 5432:5432
+    networks:
+      - saleor-backend-tier
+    volumes:
+      - saleor-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=saleor
+      - POSTGRES_PASSWORD=saleor
+
+  redis:
+    image: library/redis:5.0-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - saleor-backend-tier
+    volumes:
+      - saleor-redis:/data
+
+  worker:
+    build:
+      context: ./saleor
+      dockerfile: ./Dockerfile
+      args:
+        STATIC_URL: "/static/"
+    command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
+    networks:
+      - saleor-backend-tier
+    env_file: common.env
+    depends_on:
+      - redis
+      - mailhog
+    volumes:
+      # shared volume between worker and api for media
+      - saleor-media:/app/media
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui. Visit http://localhost:8025/ to check emails
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+
+  saleor_algolia_db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=saleor_algolia
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 48082:5432
+
+  saleor_algolia:
+    build:
+      context: ./saleor-algolia
+      dockerfile: Dockerfile
+    command: saleor-algolia run --debug
+    environment: 
+      - APP_SETTINGS=saleor_algolia.settings.settings
+      - DEBUG=true
+      - DATABASE_DSN=postgresql://saleor_algolia:password@saleor_algolia_db:5432/saleor_algolia
+      - ROOT_LOG_LEVEL=DEBUG
+      - ENVIRONMENT=dev-local
+      - INDEX_ENV=dev
+    ports:
+      - 8082:8080
+    depends_on:
+      - saleor_algolia_db
+
+  sample_transformer:
+    build:
+      context: ./saleor-algolia/sample_transformer
+      dockerfile: Dockerfile
+    command: uvicorn sample_transformer.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - 8083:8000
+
+
+volumes:
+  saleor-db:
+    driver: local
+  saleor-redis:
+    driver: local
+  saleor-media:
+
+networks:
+  saleor-backend-tier:
+    driver: bridge

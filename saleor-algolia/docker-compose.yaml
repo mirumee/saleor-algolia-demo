@@ -1,0 +1,55 @@
+version: '3.7'
+
+networks:
+    saleor:
+        external: true
+
+services:
+    db:
+        image: postgres:13
+        environment:
+            - POSTGRES_USER=saleor_algolia
+            - POSTGRES_PASSWORD=password
+        networks:
+            - saleor
+        ports:
+            - 58082:5432
+
+    saleor_algolia:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args: 
+                INSTALL_DEV: "true"
+        command: saleor-algolia run --debug
+        environment: 
+            - APP_SETTINGS=saleor_algolia.settings.settings
+            - DEBUG=true
+            - DATABASE_DSN=postgresql://saleor_algolia:password@db:5432/saleor_algolia
+            - ROOT_LOG_LEVEL=DEBUG
+            - ENVIRONMENT=dev-local
+            - INDEX_ENV=dev
+        volumes:
+            - ./src/saleor_algolia:/app/src/saleor_algolia
+        ports:
+            - 8082:8080
+        networks:
+            - saleor
+        depends_on:
+            - db
+
+    sample_transformer:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args: 
+                INSTALL_DEV: "true"
+        command: sample_transformer.app:app --reload
+        entrypoint: uvicorn
+        volumes:
+            - ./libs:/app/libs
+            - ./sample_transformer:/app/sample_transformer
+        ports:
+            - 8083:8000
+        networks:
+            - saleor
